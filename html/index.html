@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>shape 编辑器</title>
+    <link rel="stylesheet" href="../static/libs/layui-v2.5.5/layui/css/layui.css">
+    <link rel="stylesheet" href="../static/css/index.css">
+
+    <script src="../static/libs/jquery-2.1.4/jquery.min.js"></script>
+    <script src="../static/libs/layui-v2.5.5/layui/layui.js"></script>
+    <script src="../static/js/index.js"></script>
+</head>
+<body>
+<ul class="layui-nav edit-header" lay-filter="headNavLayFilter">
+    <li class="layui-nav-item layui-this">
+        <a href="javascript:;">文件</a>
+        <dl class="layui-nav-child">
+            <dd><a href="javascript:;" data-type="opendir">打开文件夹</a></dd>
+            <dd><a href="javascript:;" data-type="openfile">打开文件</a></dd>
+            <dd><a href="javascript:;" data-type="exit">退出</a></dd>
+        </dl>
+    </li>
+    <li class="layui-nav-item"><a href="">编辑</a></li>
+    <li class="layui-nav-item">
+        <a href="javascript:;">选择</a>
+        <dl class="layui-nav-child">
+            <dd><a href="javascript:;">移动模块</a></dd>
+            <dd><a href="javascript:;">后台模版</a></dd>
+            <dd class="layui-this"><a href="">选中项</a></dd>
+            <dd><a href="javascript:;">电商平台</a></dd>
+        </dl>
+    </li>
+    <li class="layui-nav-item"><a href="">查看</a></li>
+</ul>
+<div class="layui-row main">
+    <div class="layui-col-xs2">
+        <!--
+            <div id="leftTree" class="demo-tree demo-tree-box"></div>
+        -->
+        <ul id="leftList" class="layui-nav layui-nav-tree layui-inline" lay-filter="leftLayFilter"
+            style="margin-right: 10px;width:100%">
+            <li id="leftShpList" class="layui-nav-item layui-nav-itemed">
+                <a href="javascript:;">默认展开</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;">选项一</a></dd>
+                    <dd><a href="javascript:;">选项二</a></dd>
+                    <dd><a href="javascript:;">选项三</a></dd>
+                    <dd><a href="">跳转项</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item">
+                <a href="javascript:;">其他</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;">移动模块</a></dd>
+                    <dd><a href="javascript:;">后台模版</a></dd>
+                    <dd><a href="javascript:;">电商平台</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item"><a href="javascript:;">其他</a></li>
+        </ul>
+
+    </div>
+    <div class="layui-col-xs10">
+        <div class="center-filter" id="centerFilter">
+            <form class="layui-form" action="">
+                <div>
+                    <button type="button" class="layui-btn layui-btn-primary" id="exports">导出</button>
+                    <button type="button" class="layui-btn" id="joinAdd">关联新增</button>
+                    <button type="button" class="layui-btn layui-btn-normal">百搭按钮</button>
+                    <button type="button" class="layui-btn layui-btn-warm">暖色按钮</button>
+                    <button type="button" class="layui-btn layui-btn-danger">警告按钮</button>
+                    <button type="button" class="layui-btn layui-btn-disabled">禁用按钮</button>
+                </div>
+                <div>
+                    <select name="interest" lay-filter="selectEncoding" id="selectEncoding">
+                        <option value="utf-8">UTF-8</option>
+                        <option value="gbk">GBK</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="center-contanier" id="maincenter" style="background: #e2e2e2;">
+            <table class="layui-hide" id="shpList"></table>
+        </div>
+    </div>
+</div>
+
+
+</body>
+<div id="editDIV" style="display:none;padding: 2px 5px;">
+    <div style="width: 100%;height: 100%;background: #FFFFFF;">
+        <form class="layui-form" action="">
+            <div class="layui-form-item">
+                <button type="button" class="layui-btn layui-btn-warm" id="saveShp">保存
+                </button>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">选择Excel</label>
+                    <div class="layui-input-block">
+                        <select name="interest" lay-filter="selectExcel" id="selectExcel">
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">shp字段</label>
+                    <div class="layui-input-block">
+                        <select name="interest" lay-filter="aihao" id="selectShp">
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">Excel字段</label>
+                    <div class="layui-input-block">
+                        <select name="interest" lay-filter="aihao" id="selectExcelHead">
+                            <option value=""></option>
+                            <option value="0">写作</option>
+                            <option value="1" selected="">阅读</option>
+                            <option value="2">游戏</option>
+                            <option value="3">音乐</option>
+                            <option value="4">旅行</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="layui-btn layui-btn-warm" id="joinFiled"
+                        onclick="addBindJoin()">添加关联
+                </button>
+            </div>
+            <div class="layui-form-item">
+                <div class="bind-area" style="height: 100px;width: 100%;background: #FFFFFF;" id="joinListArea">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">新增字段</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="newFiledText" id="newFiledText" value=""
+                               class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">绑定字段</label>
+                    <div class="layui-input-block">
+                        <select name="interest" lay-filter="bindExcel" id="selectBindExcel">
+                            <option value=""></option>
+                            <option value="0">写作</option>
+                            <option value="1" selected="">阅读</option>
+                            <option value="2">游戏</option>
+                            <option value="3">音乐</option>
+                            <option value="4">旅行</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" class="layui-btn layui-btn-warm" id="addNewFiled"
+                        onclick="clickAddNewFiled(this)">新增字段
+                </button>
+            </div>
+
+        </form>
+        <div class="layui-form">
+            <table class="layui-table">
+                <colgroup>
+                    <col width="150">
+                    <col width="150">
+                    <col width="200">
+                    <col>
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>新增字段</th>
+                    <th>绑定字段</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="addTbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</html>
