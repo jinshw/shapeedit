@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"reflect"
 	"strconv"
 	"strings"
 )
@@ -75,38 +74,6 @@ func main() {
 		result.Msg = "success"
 		result.Data = results
 		context.JSON(http.StatusOK, result)
-	})
-
-	r.GET("/list", func(c *gin.Context) {
-
-		// open a shapefile for reading
-		shape, err := shp.Open("test.shp")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer shape.Close()
-
-		// fields from the attribute table (DBF)
-		fields := shape.Fields()
-
-		// loop through all features in the shapefile
-		for shape.Next() {
-			n, p := shape.Shape()
-
-			// print feature
-			fmt.Println(reflect.TypeOf(p).Elem(), p.BBox())
-
-			// print attributes
-			for k, f := range fields {
-				val := shape.ReadAttribute(n, k)
-				fmt.Printf("\t%v: %v\n", f, val)
-			}
-			if n == 41519 {
-				fmt.Println("n===41519")
-			}
-			fmt.Println(n)
-		}
-
 	})
 
 	r.GET("/shpList", func(c *gin.Context) {
@@ -444,9 +411,6 @@ func updateShape(shapeFile string, obj Data, result []map[string]string, dict ma
 		for shape.Next() {
 			n, p := shape.Shape()
 			shapeNew.Write(p)
-
-			// print attributes
-			//count := 0
 			dictKeyStr = "#"
 			for key, val := range obj.JoinObj {
 				fmt.Println(key, val)
@@ -457,40 +421,20 @@ func updateShape(shapeFile string, obj Data, result []map[string]string, dict ma
 				getVal = strings.Replace(getVal, "\\x00", "", -1)
 				dictKeyStr = dictKeyStr + getVal + "#"
 			}
-
 			for k, f := range fieldsObj {
 				val := shape.ReadAttribute(n, k)
 				dec := mahonia.NewDecoder(Encoding)
 				val = dec.ConvertString(val)
 				shapeNew.WriteAttribute(n, k, val)
-				//keyFiled := f.String()
 				fmt.Println(k, f)
-
-				//if strings.Contains(dictValStr, "#"+keyFiled+"#") {
-				//	shapeNew.WriteAttribute(n, count, DictData[dictKeyStr][keyFiled])
-				//	fmt.Println(dictKeyStr, keyFiled)
-				//	fmt.Println(n, count, dict[dictKeyStr][keyFiled])
-				//} else {
-				//	shapeNew.WriteAttribute(n, k, val)
-				//}
-
-				//name := shape.GetValue("NAME")
-				//fmt.Println("NAME === " + name)
-				//shapeNew.WriteAttribute(n, k, val)
-				//count = k
-				//fmt.Println(f, shape.Attribute(2))
 			}
 			teampBindField := dictValStr[1 : len(dictValStr)-1]
 			bindFileds := strings.Split(teampBindField, "#")
 			for idx := 0; idx < len(bindFileds); idx++ {
 				bindFiled := bindFileds[idx]
 				newVal := DictData[dictKeyStr][bindFiled]
-				//dec := mahonia.NewDecoder(Encoding)
-				//newVal = dec.ConvertString(newVal)
 				shapeNew.WriteAttribute(n, len(fieldsObj)+idx, newVal)
 			}
-			//shapeNew.WriteAttribute(n, count+1, 101)
-			//shapeNew.WriteAttribute(n, count+2, "男10and女1")
 		}
 	})
 }
