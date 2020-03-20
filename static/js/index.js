@@ -11,9 +11,9 @@ $(function () {
     renderForm()
     getFileList();
     $("#exports").click(function () {
-        if(shapename == ""){
+        if (shapename == "") {
             layer.msg("请先选择文件")
-        }else{
+        } else {
             window.location.href = "/exports";
         }
 
@@ -36,7 +36,24 @@ $(function () {
 
     $("#saveShp").click(function () {
         saveShp()
-    })
+    });
+
+    $("#convBT").click(function () {
+        console.log("convBT...")
+        var filename = $("#leftShpList").find("dd.layui-this").find("a").data("filename")
+        console.log(filename)
+        layer.confirm('GCJ02坐标系==>WGS84坐标系？', {
+            btn: ['确认','取消'] //按钮
+        }, function(){
+            layer.msg('的确很重要', {icon: 1});
+        }, function(){
+            layer.msg('也可以这样', {
+                time: 20000, //20s后自动关闭
+                btn: ['明白了', '知道了']
+            });
+        });
+    });
+
 });
 
 function resetSize() {
@@ -51,7 +68,7 @@ function getCols(filename) {
     $.ajax({
         url: "http://localhost:8080/getCols",
         type: "get",
-        data: {filename: filename,encoding:encoding},
+        data: {filename: filename, encoding: encoding},
         dataType: "json",
         success: function (data) {
             console.log(data.data)
@@ -69,36 +86,38 @@ function getTableCols(datas) {
     return results;
 }
 
-layui.use('element', function () {
-    var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
+function initLayer() {
+    layui.use('element', function () {
+        var element = layui.element; //导航的hover效果、二级菜单等功能，需要依赖element模块
 
-    //监听导航点击
-    element.on('nav(headNavLayFilter)', function (elem) {
-        //console.log(elem)
-        var type = elem.data("type")
-        switch (type) {
-            case "opendir":
-                // CarryOut()
-                break;
-            case "openfile":
-                break;
-            case "exit":
-                break;
-            default:
-                break;
-        }
+        //监听导航点击
+        element.on('nav(headNavLayFilter)', function (elem) {
+            //console.log(elem)
+            var type = elem.data("type")
+            switch (type) {
+                case "opendir":
+                    // CarryOut()
+                    break;
+                case "openfile":
+                    break;
+                case "exit":
+                    break;
+                default:
+                    break;
+            }
+        });
+        element.on('nav(leftLayFilter)', function (elem) {
+            var type = elem.data("type")
+            if (type == "shape") {
+                var filename = elem.data("filename")
+                getCols(filename)
+                shapename = filename
+            }
+            console.log(elem.data("filename"))
+            // layer.msg(elem.text()+"11");
+        });
     });
-    element.on('nav(leftLayFilter)', function (elem) {
-        var type = elem.data("type")
-        if (type == "shape") {
-            var filename = elem.data("filename")
-            getCols(filename)
-            shapename = filename
-        }
-        console.log(elem.data("filename"))
-        // layer.msg(elem.text()+"11");
-    });
-});
+}
 
 
 function saveShp(e) {
@@ -120,9 +139,9 @@ function saveShp(e) {
         // data: JSON.stringify({joinObj: "joinObj", addList: "addList"}),
         dataType: "json",
         success: function (data) {
-            if(data.code == 200){
+            if (data.code == 200) {
                 layer.msg("保存成功")
-            }else{
+            } else {
                 layer.msg("保存失败")
             }
         }
@@ -258,10 +277,10 @@ function renderForm() {
         });
 
         form.on('select(selectEncoding)', function (data) {
-            if(shapename == ""){
+            if (shapename == "") {
                 layer.msg("请先选择文件")
                 return;
-            }else{
+            } else {
                 getCols(shapename)
             }
         });
@@ -323,6 +342,7 @@ function getFileList() {
                 }
                 _lis = _lis + "</dl>";
                 $("#leftShpList").html(_lis)
+                initLayer()
             } else {
                 layer.msg("获取文件列表有问题")
             }
@@ -359,6 +379,6 @@ function getDirPathByFile(filepath) {
 }
 
 
-layui.use('layer', function(){
+layui.use('layer', function () {
     layer = layui.layer;
 });

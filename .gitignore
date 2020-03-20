@@ -19,6 +19,7 @@ target/
 .git/
 .svn
 .idea/
+**/shape/**
 **/**/vue/xjone/node_modules/
 **/vue/xjone/.vscode/
 **/src/main/webapp/page/pad/

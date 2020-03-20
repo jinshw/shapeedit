@@ -61,7 +61,7 @@ func main() {
 		//}
 
 		fields := GetCols(filepath)
-		for i := range (fields) {
+		for i := range fields {
 			fmt.Println(i, string(fields[i].Name[:]))
 			var col Column
 			col.Id = i
@@ -105,31 +105,32 @@ func main() {
 		fields := shape.Fields()
 
 		results := make([]map[string]string, 0)
-		for shape.Next() {
-			n, p := shape.Shape()
-			fmt.Println(n, p, fields, startPageNumber)
-			if n >= (startPageNumber-1) && n <= (endPageNumber-1) {
-				var item map[string]string
-				item = make(map[string]string)
+		//for shape.Next() {
+		n, p := shape.Shape()
+		fmt.Println(n, p, fields, startPageNumber)
+		//if n >= (startPageNumber-1) && n <= (endPageNumber-1) {
+		for n := (startPageNumber - 1); n <= (endPageNumber - 1); n++ {
+			var item map[string]string
+			item = make(map[string]string)
 
-				for k, f := range fields {
-					val := shape.ReadAttribute(n, k)
-					//name := shape.GetValue("NAME")
-					fmt.Println(n, p, k, f, val)
+			for k, f := range fields {
+				val := shape.ReadAttribute(n, k)
+				//name := shape.GetValue("NAME")
+				fmt.Println(n, p, k, f, val)
 
-					name := string(f.Name[:])
-					name = strings.Trim(strings.Replace(name, "\u0000", "", -1), " ")
-					dec := mahonia.NewDecoder(Encoding)
-					valutf8 := dec.ConvertString(val)
-					item[name] = valutf8
-				}
-				results = append(results, item)
+				name := string(f.Name[:])
+				name = strings.Trim(strings.Replace(name, "\u0000", "", -1), " ")
+				dec := mahonia.NewDecoder(Encoding)
+				valutf8 := dec.ConvertString(val)
+				item[name] = valutf8
 			}
-			if n >= endPageNumber {
-				break
-			}
-
+			results = append(results, item)
 		}
+		//if n >= endPageNumber {
+		//	break
+		//}
+
+		//}
 
 		var result Result
 		result.Code = 0
@@ -360,7 +361,7 @@ func readExcel(excelPath string, obj Data) ([]map[string]string, map[string]map[
 			for _, cell := range row.Cells {
 				text := cell.String()
 				fmt.Printf("%s\n", text)
-				teampMap[ strconv.Itoa(count)] = text
+				teampMap[strconv.Itoa(count)] = text
 				if rowCount == 0 {
 					if strings.Contains(dictKeyStr, "#"+text+"#") {
 						dictKeyStr = strings.Replace(dictKeyStr, text, strconv.Itoa(count), -1)
@@ -467,7 +468,7 @@ func WalkDir(dirPath string, suffix string) (files []string, err error) {
 	suffix = strings.ToUpper(suffix) //忽略后缀匹配的大小写
 
 	err = filepath.Walk(dirPath, func(filename string, fi os.FileInfo, err error) error { //遍历目录
-		if fi.IsDir() { // 忽略目录
+		if fi.IsDir() {                                                                   // 忽略目录
 			return nil
 		}
 		if suffix != "*" {
