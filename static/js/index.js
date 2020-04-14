@@ -1,3 +1,10 @@
+//map set
+var latlngArr = []
+var m = null
+var mapURL = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+var shpfileLayer = null
+//--map set
+
 var layer;
 var leftTreeWdith = 360;
 var cols = [];
@@ -6,6 +13,7 @@ var addList = []
 var shapename = ""
 
 $(function () {
+    initMap()
     resetSize();
     // getCols();
     renderForm()
@@ -43,14 +51,22 @@ $(function () {
         var filename = $("#leftShpList").find("dd.layui-this").find("a").data("filename")
         console.log(filename)
         layer.confirm('GCJ02坐标系==>WGS84坐标系？', {
-            btn: ['确认','取消'] //按钮
-        }, function(){
-            layer.msg('的确很重要', {icon: 1});
-        }, function(){
-            layer.msg('也可以这样', {
-                time: 20000, //20s后自动关闭
-                btn: ['明白了', '知道了']
-            });
+            btn: ['确认', '取消'] //按钮
+        }, function () {
+            var encoding = $("#selectEncoding").val()
+            $.ajax({
+                url: "http://localhost:8080/converCoordinate",
+                type: "get",
+                data: {filename: filename, encoding: encoding},
+                dataType: "json",
+                success: function (data) {
+                    if (data.code != 0) {
+                        layer.msg('转换成功', {icon: 1});
+                    }
+                }
+            })
+        }, function () {
+            // layer.msg('已经取消', {icon: 1});
         });
     });
 
@@ -114,6 +130,8 @@ function initLayer() {
                 shapename = filename
             }
             console.log(elem.data("filename"))
+            clearShapeFileLayer()
+            loadShapeMap()
             // layer.msg(elem.text()+"11");
         });
     });
@@ -338,7 +356,7 @@ function getFileList() {
                     var fileNames = filePath.split("\\")
                     var fileName = fileNames[fileNames.length - 1]
                     console.log(fileName)
-                    _lis = _lis + `<dd><a href="javascript:;" data-type="shape" data-filename="${fileName}">${fileName}</a></dd>`;
+                    _lis = _lis + `<dd><a href="javascript:;" data-type="shape" title="${fileName}" data-filename="${fileName}">${fileName}</a></dd>`;
                 }
                 _lis = _lis + "</dl>";
                 $("#leftShpList").html(_lis)
@@ -382,3 +400,53 @@ function getDirPathByFile(filepath) {
 layui.use('layer', function () {
     layer = layui.layer;
 });
+
+function initMap() {
+    m = L.map('map').setView([42.5463, 86.0553], 6);
+    var watercolor = L.tileLayer(mapURL, {
+        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
+    }).addTo(m);
+    loadShapeMap()
+
+}
+
+function loadShapeMap() {
+    console.log("shapename=====", shapename)
+    latlngArr = []
+    if (shapename != '') {
+        var lastIndex = shapename.lastIndexOf(".")
+        var shapeNameTemp = shapename.slice(0, lastIndex)
+        shpfileLayer = new L.Shapefile('../../shape/' + shapeNameTemp, {
+            onEachFeature: function (feature, layer) {
+                if (feature.properties) {
+                    layer.bindPopup(Object.keys(feature.properties).map(function (k) {
+                        return k + ": " + feature.properties[k];
+                    }).join("<br />"), {
+                        maxHeight: 2000
+                    });
+                }
+                if (feature.geometry.type == "Point") {
+                    latlngArr.push(layer._latlng)
+                } else {
+                    latlngArr = latlngArr.concat(layer._latlngs)
+                }
+
+
+            }
+        });
+        shpfileLayer.addTo(m);
+        shpfileLayer.once("data:loaded", function (data) {
+            console.log("finished loaded shapefile");
+            //m.setView()
+            bounds = L.latLngBounds(latlngArr)
+            m.fitBounds(bounds)
+            latlngArr = []
+        });
+    }
+}
+
+function clearShapeFileLayer() {
+    if (shpfileLayer != null) {
+        m.removeLayer(shpfileLayer)
+    }
+}

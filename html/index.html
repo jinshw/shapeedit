@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>shape 编辑器</title>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css"/>
     <link rel="stylesheet" href="../static/libs/layui-v2.5.5/layui/css/layui.css">
     <link rel="stylesheet" href="../static/css/index.css">
 
     <script src="../static/libs/jquery-2.1.4/jquery.min.js"></script>
     <script src="../static/libs/layui-v2.5.5/layui/layui.js"></script>
+    <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+    <script src="../static/libs/leaflet-shpfile/catiline.js"></script>
+    <script src="../static/libs/leaflet-shpfile/leaflet.shpfile.js"></script>
     <script src="../static/js/index.js"></script>
 </head>
 <body>
@@ -79,6 +83,7 @@
                 </div>
             </form>
         </div>
+        <div id="map" style="height: 300px;"></div>
         <div class="center-contanier" id="maincenter" style="background: #e2e2e2;">
             <table class="layui-hide" id="shpList"></table>
         </div>
