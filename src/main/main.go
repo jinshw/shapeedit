@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/axgle/mahonia"
 	"github.com/gin-gonic/gin"
-	"github.com/jonas-p/go-shp"
+	"github.com/jinshw/go-shp"
 	"github.com/tealeg/xlsx"
 	"io/ioutil"
 	"log"
